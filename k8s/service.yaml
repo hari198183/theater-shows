@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shows-svc
+  namespace: shows
+spec:
+  selector:
+    app: shows
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP

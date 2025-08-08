@@ -1,0 +1,26 @@
+replicaCount: 2
+
+image:
+  repository: your-registry/shows
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+env:
+  springDatasourceUrl: jdbc:postgresql://postgres:5432/shows
+  springDatasourceUsername: postgres
+  springDatasourcePassword: postgres
+
+ingress:
+  enabled: false

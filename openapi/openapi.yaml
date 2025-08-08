@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: Theatre Shows API
+  version: "1.0.0"
+  description: API for managing theatre shows (create, update, delete, list)
+servers:
+  - url: /api/v1
+paths:
+  /shows:
+    post:
+      summary: Create a show
+      operationId: createShow
+      security:
+        - oauth2: [ "shows:write" ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Show'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+        '400':
+          description: Validation error
+    get:
+      summary: List shows by theatre and date range
+      operationId: listShows
+      security:
+        - oauth2: [ "shows:read" ]
+      parameters:
+        - name: theatreId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of shows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Show'
+  /shows/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get show by id
+      operationId: getShow
+      security:
+        - oauth2: [ "shows:read" ]
+      responses:
+        '200':
+          description: Show found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+        '404':
+          description: Not found
+    put:
+      summary: Replace a show
+      operationId: replaceShow
+      security:
+        - oauth2: [ "shows:write" ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Show'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Show'
+        '404':
+          description: Not found
+    patch:
+      summary: Partial update of a show
+      operationId: patchShow
+      security:
+        - oauth2: [ "shows:write" ]
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Delete show
+      operationId: deleteShow
+      security:
+        - oauth2: [ "shows:admin" ]
+      responses:
+        '204':
+          description: Deleted
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            shows:read: Read shows
+            shows:write: Create/Update shows
+            shows:admin: Admin actions
+  schemas:
+    Show:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        theatreId:
+          type: string
+          format: uuid
+        movieId:
+          type: string
+          format: uuid
+        screen:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        language:
+          type: string
+        seatsTotal:
+          type: integer
+        seatsAvailable:
+          type: integer
+      required:
+        - theatreId
+        - movieId
+        - startTime
+        - endTime
